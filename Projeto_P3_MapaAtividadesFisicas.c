@@ -12,12 +12,14 @@ int state;
 
 struct Activity{
 	int type;
+	char typeOf[30];
 	float duration;
 	float caloriesLost;
+	float caloriesPerHour;
 };
 
 struct Day{
-	char date[8];
+	char date[10];
 	float caloriesTotal;
 	struct Activity activities[3];
 };
@@ -168,10 +170,239 @@ void loggedPage(){
 }
 
 void showActivities(){
-	printf("================================\n\n");
-		printf("Pagina das 'Atividades'\n\n");
+	
+	int i,j;
+	float somaCalories = 0;
+	
+	printf("================================================================================================\n\n");
+		printf("Dias e Atividades: \n\n");
 		
-	printf("\n\n================================\n");	
+		for( i=0 ; i<7 ; i++){
+			printf("------------------------------------------------------------------------\n");
+			if(i == 0){
+				
+				if( user.days[i].caloriesTotal == 0){
+					printf("Hoje, voce ainda nao cadastrou atividades fisicas !");
+				}else{
+					printf("\nHoje, na data [%s], voce praticou: ", user.days[i].date );
+					
+					for( j=0 ; j<3 ; j++){
+						
+						printf("\n\n - Tipo de Atividade: %s", user.days[i].activities[j].typeOf);
+						printf("\n - Duracao: %.1f H", user.days[i].activities[j].duration);
+						printf("\n - Calorias perdidas: %.2f Cal\n ", user.days[i].activities[j].caloriesLost);
+						
+					}
+					
+				}
+				
+			}else{
+				
+				if( user.days[i].caloriesTotal == 0){
+					printf("Ha %d dia(as) atras, voce ainda nao cadastrou atividades fisicas !", i);
+				}else{
+					printf("\nHoje, na data [%s], voce praticou: ", user.days[i].date );
+					
+					for( j=0 ; j<3 ; j++){
+						
+						printf("\n\n - Tipo de Atividade: %s", user.days[i].activities[j].typeOf);
+						printf("\n - Duracao: %.1f H", user.days[i].activities[j].duration);
+						printf("\n - Calorias perdidas: %.2 Cal\n ", user.days[i].activities[j].caloriesLost);
+						
+					}
+				}
+				
+			}
+			printf("\n------------------------------------------------------------------------\n\n");
+		}
+		
+		for( i=0 ; i<7 ; i++){
+			somaCalories = somaCalories + user.days[i].caloriesTotal;
+		}
+		
+		printf("Seu 'Gasto (ou Ganho) Calorico' durante os ultimos 7 dias: %.2f", somaCalories );
+		printf("\nSua 'Peso Inicial': %.2f", user.initialWeight);
+		printf("\nSua 'Sua Altura': %d", user.height);
+			
+		
+		printf("\n\n(0) - Voltar para a pagina incial.\n");
+		printf("(2) - Editar Dias e Atividades Fisicas");
+		
+	printf("\n\n================================================================================================\n");	
+}
+
+void editActivities(){
+	printf("================================\n\n");
+		printf("Pagina de Edicao: \n\n");
+		printf("(0) - Editar atividades de hoje.\n");
+		printf("(1) - Editar atividades de ontem.\n");
+		printf("(2) - Editar atividades de 2 dia atras.\n");
+		printf("(3) - Editar atividades de 3 dia atras.\n");
+		printf("(4) - Editar atividades de 4 dia atras.\n");
+		printf("(5) - Editar atividades de 5 dia atras.\n");
+		printf("(6) - Editar atividades de 6 dia atras.\n");
+		printf("(-1) - Voltar para a pagina inicial");
+		
+	printf("\n\n================================\n");
+}
+
+void editActivitiesFunc(int dayInd){
+	
+	int i;
+	
+	printf("================================\n\n");
+		
+		if(dayInd == 0){
+			printf("Editar atividades de Hoje\n\n");
+		}else if(dayInd == 1){
+			printf("Editar atividades de Ontem\n\n");
+		} else {
+			printf("Editar atividades de %d dias atras\n\n", dayInd);
+		}
+		
+		for( i=0 ; i<3 ; i++){
+			printf("(%d) - Alterar Atividade %d (Tipo: %s)\n", i , i+1 , user.days[dayInd].activities[i].typeOf);
+		}
+		
+	printf("\n================================\n");
+}
+
+void editActivitiesFuncReal(int temp , int dayInd ){
+	int escolha;
+	printf("================================\n\n");
+		
+		printf("(0) - Apagar todos os dados da atividade.\n");
+		printf("(1) - Modificar dados da atividade.\n");
+		
+	printf("\n================================\n");
+	printf("Digite sua escolha: ");
+	scanf("%d", &escolha);
+	system("cls");
+	
+	if(escolha == 0){
+		user.days[dayInd].activities[temp].caloriesLost = 0;
+		user.days[dayInd].activities[temp].duration = 0;
+		user.days[dayInd].activities[temp].type = -1;
+		user.days[dayInd].activities[temp].typeOf[30] = "\0";
+		
+		printf("================================\n\n");
+		printf("Dados apagos com Sucesso.\n\n");
+	}else if(escolha == 1){
+		
+		int newTemp = 0;
+		
+		while(newTemp != -1){
+			printf("================================\n\n");
+		
+			printf("Tipo de Atividade: %s \nDuracao da Atividade: %.2f \nCalorias Perdidas na Atividade: %.2f", user.days[dayInd].activities[temp].typeOf , user.days[dayInd].activities[temp].duration , user.days[dayInd].activities[temp].caloriesLost);
+			
+			printf("\n\n(0) - Alterar Duracao.\n");
+			printf("(1) - Alterar Tipo.\n");
+			printf("(-1) - Salvar alteracao.\n");
+			
+			printf("\n================================\n");	
+			printf("Digite sua escolha: ");
+			scanf("%d", &newTemp);
+			
+			
+			if(newTemp == 0){
+				
+				if(user.days[dayInd].activities[temp].type != NULL){
+					printf("================================\n\n");
+		
+					printf("Digite a nova Duracao (em Horas): ");
+					scanf("%f" , &user.days[dayInd].activities[temp].duration);
+					
+					user.days[dayInd].activities[temp].caloriesLost = (user.days[dayInd].activities[temp].caloriesPerHour)*(user.days[dayInd].activities[temp].duration);
+				
+				}else{
+					system("cls");
+					printf("================================\n\n");
+		
+					printf("Alterar a 'Duracao' adicione um 'Tipo'.\n\n");
+				}
+				
+			}else if(newTemp == 1){
+				system("cls");
+				
+				int tipo; 
+				
+				printf("================================\n\n");
+				
+				printf("(0) - CORRIDA\n");
+				printf("(1) - CAMINHADA\n");
+				printf("(2) - BICICLETA\n");
+				printf("(3) - NATACAO\n");
+				printf("(4) - MUSCULACAO\n");
+				printf("(5) - DANCA\n");
+				printf("(6) - Outros\n");
+				
+				printf("\n================================\n");	
+				printf("Digite sua escolha: ");
+				scanf("%d", &tipo);
+				system("cls");
+				
+				user.days[dayInd].activities[temp].type = tipo;
+				
+				if(tipo == 0){
+					user.days[dayInd].activities[temp].caloriesPerHour = 700;
+					user.days[dayInd].activities[temp].typeOf[30] = "CORRIDA";
+					user.days[dayInd].activities[temp].caloriesLost = (user.days[dayInd].activities[temp].caloriesPerHour)*(user.days[dayInd].activities[temp].duration);
+				}else if(tipo == 1){
+					user.days[dayInd].activities[temp].caloriesPerHour = 535;
+					user.days[dayInd].activities[temp].typeOf[30] = "CAMINHADA";
+					user.days[dayInd].activities[temp].caloriesLost = (user.days[dayInd].activities[temp].caloriesPerHour)*(user.days[dayInd].activities[temp].duration);
+				}else if(tipo == 2){
+					user.days[dayInd].activities[temp].caloriesPerHour = 800;
+					user.days[dayInd].activities[temp].typeOf[30] = "BICICLETA";
+					user.days[dayInd].activities[temp].caloriesLost = (user.days[dayInd].activities[temp].caloriesPerHour)*(user.days[dayInd].activities[temp].duration);
+				}
+				else if(tipo == 3){
+					user.days[dayInd].activities[temp].caloriesPerHour = 700 ;
+					user.days[dayInd].activities[temp].typeOf[30] = "NATACAO";
+					user.days[dayInd].activities[temp].caloriesLost = (user.days[dayInd].activities[temp].caloriesPerHour)*(user.days[dayInd].activities[temp].duration);
+				}
+				else if(tipo == 4){
+					user.days[dayInd].activities[temp].caloriesPerHour = 400;
+					user.days[dayInd].activities[temp].typeOf[30] = "MUSCULACAO";
+					user.days[dayInd].activities[temp].caloriesLost = (user.days[dayInd].activities[temp].caloriesPerHour)*(user.days[dayInd].activities[temp].duration);
+				}
+				else if(tipo == 5){
+					user.days[dayInd].activities[temp].caloriesPerHour = 450 ;
+					user.days[dayInd].activities[temp].typeOf[30] = "DANCA";
+					user.days[dayInd].activities[temp].caloriesLost = (user.days[dayInd].activities[temp].caloriesPerHour)*(user.days[dayInd].activities[temp].duration);
+				}
+				else if(tipo == 6){
+					
+					printf("Digite o 'tipo de atividade': ");
+					scanf("%s" , &user.days[dayInd].activities[temp].typeOf);
+					user.days[dayInd].activities[temp].typeOf[30] = toupper(user.days[dayInd].activities[temp].typeOf);
+					printf("Digite quantas 'calorias sao gastar por hora' (cal/h): ");
+					scanf("%f" , &user.days[dayInd].activities[temp].caloriesPerHour);
+					
+					user.days[dayInd].activities[temp].caloriesLost = (user.days[dayInd].activities[temp].caloriesPerHour)*(user.days[dayInd].activities[temp].duration);
+				}
+				
+			} 
+			
+			if(newTemp == -1){
+				int j;
+				user.days[dayInd].caloriesTotal = 0;
+				
+				for( j=0 ; j<3 ; j++){
+					user.days[dayInd].caloriesTotal = user.days[dayInd].caloriesTotal + user.days[dayInd].activities[j].caloriesLost;
+				}
+				
+			}	
+			
+		}		
+		
+		printf("================================\n\n");
+		printf("Dados Modificados com Sucesso.\n\n");
+	}
+	
+	
+	
 }
 
 int main(void) {
@@ -258,6 +489,34 @@ int main(void) {
 								printf("Digite sua escolha: ");
 								scanf("%d", &stateLogged);
 								system("cls");
+								
+								if(stateLogged == 2){
+									int dayIndex;
+									editActivities();
+									printf("Digite sua escolha: ");
+									scanf("%d", &dayIndex);
+									system("cls");
+									
+									if(dayIndex == -1){
+										stateLogged = 0;
+									}else{
+										
+										int temp;
+										editActivitiesFunc(dayIndex);
+										printf("Digite sua escolha: ");
+										scanf("%d", &temp);
+										system("cls");
+										
+										editActivitiesFuncReal(temp , dayIndex);
+										// Ajustar essa parte Ajustar essa parte Ajustar essa parte Ajustar essa parte Ajustar essa parte 
+										if(dayIndex == -1){
+											stateLogged = 0;
+										}
+										// Ajustar essa parte Ajustar essa parte Ajustar essa parte Ajustar essa parte Ajustar essa parte 
+									}
+									
+									system("cls");
+								}
 								//VIZUALIZAÇÃO DAS ATIVIDADES
 							}
 							
